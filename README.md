@@ -1,1 +1,1 @@
-The BITalino Arduino API documentation is available at http://BITalinoWorld.github.io/API/Arduino
+The BITalino Arduino API documentation is available at http://bitalino.com/docs/arduino-api

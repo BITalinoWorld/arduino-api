@@ -2,8 +2,8 @@
  * \file
  * \copyright  Copyright 2014 PLUX - Wireless Biosignals, S.A.
  * \author     Filipe Silva
- * \version    1.0
- * \date       June 2014
+ * \version    1.1
+ * \date       July 2014
  * 
  * \section LICENSE
  
@@ -154,10 +154,11 @@ public:
    * \param[in] samplingRate Sampling rate in Hz. Accepted values are 1, 10, 100 or 1000 Hz. Default value is 1000 Hz.
    * \param[in] channelsBitmap Bitmap of channels to acquire. Channel 0 is 0x01 and channel 5 is 0x20.
    * Default value is 0x3F (all 6 analog channels).
+   * \param[in] simulated If true, start in simulated mode. Otherwise start in live mode. Default is to start in live mode.
    * \returns true if operation succeeded, or false if an error occurred.
    * \note This method cannot be called during an acquisition.
    */
-  boolean start(int samplingRate = 1000, byte channelsBitmap = 0x3F)
+  boolean start(int samplingRate = 1000, byte channelsBitmap = 0x3F, bool simulated = false)
   {
     if (nChannels != 0)  return false;
     
@@ -196,7 +197,7 @@ public:
     delay(50);
 
     // send "start" command to device
-    Serial.write((chBmp << 2) | 0x01);
+    Serial.write((chBmp << 2) | (simulated ? 0x02 : 0x01));
 
     return true;
   }
