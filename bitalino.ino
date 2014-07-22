@@ -129,7 +129,7 @@ public:
    * Retrieves the device firmware version string.
    * \param[out] buffer Character array to receive the version string.
    * \param[in] len Size of the character array in bytes.
-   * \returns Number of bytes stored in buffer, including the terminating null character, or zero if an error occurred.
+   * \returns Number of bytes stored in buffer, excluding the terminating null character, or zero if an error occurred.
    * \note This method cannot be called during an acquisition.
    */
   byte version(char buffer[], byte len)
@@ -140,13 +140,47 @@ public:
       return 0;
     }
     
+    const char *header = "BITalino";
+    const int headerLen = strlen(header);
+
     // send "get version string" command to device
     Serial.write(7);
-
-    byte n = Serial.readBytesUntil('\n', buffer, len-1);
-    buffer[n] = 0;
     
-    return n;
+    byte n = 0;    
+    while(1)
+    {
+      if (n == len)
+      {
+        buffer[0] = 0;
+        return 0;
+      }
+      
+      int chr = Serial.read();
+      if (chr == -1)
+      {
+        buffer[0] = 0;
+        return 0;
+      }
+
+      if (n >= headerLen)
+      {
+        if (chr == '\n')
+        {
+          buffer[n] = 0;
+          return n;
+        }
+
+        buffer[n++] = chr;
+      }
+      else
+        if (chr == header[n])
+          buffer[n++] = chr;
+        else
+        {
+          n = 0;   // discard all data before version header
+          if (chr == header[0])   buffer[n++] = chr;
+        }
+    }
   }
   
   /**
